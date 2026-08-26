@@ -42,8 +42,8 @@ Começando após o pitch: A cada semana no grupo de desenvolvedores é necessár
 * 26/08/2026 - Ideia geral da tecnologia
 
 **Setembro**
-* 02/09/2026 - Pitch do jogo e feedback
-* 09/09/2026 - Movimentação FPS e visual da arma na tela
+* 02/09/2026 - Movimentação FPS e visual da arma na tela
+* 09/09/2026 - Pitch do jogo e feedback
 * 16/09/2026 - Conexão multiplayer básica (2 jogadores em cena)
 * 23/09/2026 - Cenário com iluminação/shader PSX e modelo do inimigo
 * 30/09/2026 - Captura de tela e edição do vídeo do Teaser
