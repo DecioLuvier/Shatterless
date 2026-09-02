@@ -1,0 +1,20 @@
+{
+  "enabledPlugins": {
+    "csharp-lsp@claude-plugins-official": true,
+    "godot@godot-mcp": true
+  },
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    },
+    "godot-mcp": {
+      "source": {
+        "source": "directory",
+        "path": "C:\\Users\\luvier\\Documents\\shatterless\\.claude\\plugins\\godot-mcp"
+      }
+    }
+  }
+}

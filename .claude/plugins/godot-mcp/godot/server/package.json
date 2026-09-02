@@ -1,0 +1,29 @@
+{
+  "name": "godot-mcp-shatterless",
+  "version": "0.2.0",
+  "description": "Godot MCP server (fork of Coding-Solo/godot-mcp) with two extra tools: capture_screenshot and send_game_command. No files are installed into the Godot project.",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "godot-mcp": "./build/index.js"
+  },
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "build": "tsc && node scripts/build.js",
+    "watch": "tsc --watch",
+    "inspector": "npx @modelcontextprotocol/inspector build/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "0.6.0",
+    "fs-extra": "^11.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,8 @@
+This addon is NOT versioned (its contents are ignored in .gitignore).
+
+Install it manually before opening the project:
+  - Godot AssetLib: "Godot Rollback Netcode" (author: David Snopek)
+  - or https://gitlab.com/snopek-games/godot-rollback-netcode
+    -> extract into addons/godot-rollback-netcode/ (must contain Plugin.gd, plugin.cfg)
+
+project.godot enables this plugin and the SyncManager autoload; the project won't open cleanly without this addon.

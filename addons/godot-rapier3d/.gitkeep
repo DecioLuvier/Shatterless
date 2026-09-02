@@ -1,0 +1,8 @@
+This addon is NOT versioned (its contents are ignored in .gitignore).
+
+Install it manually before opening the project:
+  - Godot AssetLib: "Godot Rapier Physics" (godot-rapier3d)
+  - or https://github.com/appsinacup/godot-rapier-physics/releases
+    -> extract into addons/godot-rapier3d/ (must contain bin/ with the native libs)
+
+project.godot already sets Rapier3D as the 3D physics engine; the project won't run without this addon.

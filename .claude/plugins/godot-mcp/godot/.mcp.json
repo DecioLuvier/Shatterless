@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "godot": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/server/build/index.js"],
+      "env": {
+        "GODOT_PATH": "C:\\Users\\luvier\\Documents\\Godot_v4.7.2-stable_mono_win64\\Godot_v4.7.2-stable_mono_win64.exe",
+        "DEBUG": "false"
+      }
+    }
+  }
+}

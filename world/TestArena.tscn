@@ -1,0 +1,104 @@
+[gd_scene format=3 uid="uid://c517eh5hvm08c"]
+
+[ext_resource type="PackedScene" uid="uid://dlu3plwhvm08c" path="res://player/player.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://dpkk6lyhvm08c" path="res://world/destructible_target.tscn" id="2"]
+
+[sub_resource type="ProceduralSkyMaterial" id="Sky_1"]
+
+[sub_resource type="Sky" id="Sky_2"]
+sky_material = SubResource("Sky_1")
+
+[sub_resource type="Environment" id="Env_1"]
+background_mode = 2
+sky = SubResource("Sky_2")
+ambient_light_source = 3
+ambient_light_color = Color(0.7, 0.7, 0.8, 1)
+ambient_light_energy = 0.6
+
+[sub_resource type="StandardMaterial3D" id="FloorMat"]
+albedo_color = Color(0.35, 0.35, 0.4, 1)
+
+[sub_resource type="BoxMesh" id="FloorMesh"]
+size = Vector3(30, 1, 30)
+
+[sub_resource type="BoxShape3D" id="FloorShape"]
+size = Vector3(30, 1, 30)
+
+[sub_resource type="BoxMesh" id="WallMeshNS"]
+size = Vector3(30, 4, 1)
+
+[sub_resource type="BoxShape3D" id="WallShapeNS"]
+size = Vector3(30, 4, 1)
+
+[sub_resource type="BoxMesh" id="WallMeshEW"]
+size = Vector3(1, 4, 30)
+
+[sub_resource type="BoxShape3D" id="WallShapeEW"]
+size = Vector3(1, 4, 30)
+
+[node name="TestArena" type="Node3D" unique_id=481187938]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=935282733]
+environment = SubResource("Env_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1610474601]
+transform = Transform3D(0.7071, -0.5, 0.5, 0, 0.7071, 0.7071, -0.7071, -0.5, 0.5, 0, 10, 0)
+shadow_enabled = true
+
+[node name="Floor" type="StaticBody3D" parent="." unique_id=646757501]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor" unique_id=1009924366]
+material_override = SubResource("FloorMat")
+mesh = SubResource("FloorMesh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=1429107396]
+shape = SubResource("FloorShape")
+
+[node name="WallNorth" type="StaticBody3D" parent="." unique_id=248454156]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -15)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="WallNorth" unique_id=1611942833]
+mesh = SubResource("WallMeshNS")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallNorth" unique_id=1815540697]
+shape = SubResource("WallShapeNS")
+
+[node name="WallSouth" type="StaticBody3D" parent="." unique_id=899865002]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 15)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="WallSouth" unique_id=1708587391]
+mesh = SubResource("WallMeshNS")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallSouth" unique_id=1996258524]
+shape = SubResource("WallShapeNS")
+
+[node name="WallEast" type="StaticBody3D" parent="." unique_id=1137215385]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="WallEast" unique_id=451097891]
+mesh = SubResource("WallMeshEW")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallEast" unique_id=1840661806]
+shape = SubResource("WallShapeEW")
+
+[node name="WallWest" type="StaticBody3D" parent="." unique_id=359600991]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="WallWest" unique_id=2039583289]
+mesh = SubResource("WallMeshEW")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallWest" unique_id=580890552]
+shape = SubResource("WallShapeEW")
+
+[node name="Player" parent="." unique_id=1492448283 instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 6)
+
+[node name="Target1" parent="." unique_id=973721862 instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.6, -6)
+
+[node name="Target2" parent="." unique_id=548408658 instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -8)
+
+[node name="Target3" parent="." unique_id=622888791 instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.6, -5)

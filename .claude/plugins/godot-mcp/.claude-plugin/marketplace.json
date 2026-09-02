@@ -1,0 +1,12 @@
+{
+  "name": "godot-mcp",
+  "description": "Project-local Godot MCP plugin for ShatterLess. Bundles the MCP server (fork of Coding-Solo/godot-mcp) plus two extra tools: capture_screenshot and send_game_command. Nothing is installed into the Godot project itself.",
+  "owner": { "name": "luvier" },
+  "plugins": [
+    {
+      "name": "godot",
+      "source": "./godot",
+      "description": "Godot MCP: headless scene ops (create/edit scenes, nodes, sprites, MeshLibrary, UIDs), run project + capture debug output, plus capture_screenshot and send_game_command against the running game."
+    }
+  ]
+}
