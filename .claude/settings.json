@@ -3,6 +3,7 @@
     "csharp-lsp@claude-plugins-official": true,
     "godot@godot-mcp": true
   },
+  "disabledMcpjsonServers": ["godot"],
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
       "source": {
@@ -13,7 +14,7 @@
     "godot-mcp": {
       "source": {
         "source": "directory",
-        "path": "C:\\Users\\luvier\\Documents\\shatterless\\.claude\\plugins\\godot-mcp"
+        "path": "./.claude/plugins/godot-mcp"
       }
     }
   }
