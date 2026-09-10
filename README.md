@@ -25,3 +25,7 @@ Follow `MAJOR.MINOR.PATCH`:
 ## [0.1.1] - 2026-09-02
 - bug fix godot mcp for linux
 - new patch notes style 
+
+## [0.1.2] - 2026-09-10
+- new godot mcp
+- Rework on developer agent

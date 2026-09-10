@@ -1,9 +1,9 @@
 {
   "enabledPlugins": {
     "csharp-lsp@claude-plugins-official": true,
-    "godot@godot-mcp": true
+    "frontend-design@claude-plugins-official": true,
+    "caveman@caveman": true
   },
-  "disabledMcpjsonServers": ["godot"],
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
       "source": {
@@ -11,10 +11,10 @@
         "repo": "anthropics/claude-plugins-official"
       }
     },
-    "godot-mcp": {
+    "caveman": {
       "source": {
-        "source": "directory",
-        "path": "./.claude/plugins/godot-mcp"
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
       }
     }
   }

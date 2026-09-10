@@ -1,6 +1,0 @@
-{
-  "name": "godot",
-  "version": "0.2.0",
-  "description": "Godot MCP server (fork of Coding-Solo/godot-mcp) with two extra tools: capture_screenshot and send_game_command. No files are added to the Godot project.",
-  "author": { "name": "luvier" }
-}

@@ -17,7 +17,9 @@ obj/
 addons/*/*
 !addons/*/.gitkeep
 .claude/screenshots/
+.claude/godot-mcp/node_modules/
 .idea/
 .DS_Store
 Thumbs.db
 desktop.ini
+.vscode/
