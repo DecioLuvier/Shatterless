@@ -23,15 +23,5 @@ systemPrompt: |
   - skill `tdd` — engineering law; obey over any generic pattern. Any code change.
   - skill `godot` — router; pick the matching `godot-*` sub-skill(s).
   - plugin `frontend-design` — UI/visual work.
-  - mcp `godot MCP` — run the project, check debug output, take screenshots.
+  - mcp `godot MCP` — run the project, check debug output.
 ---
-
-# Execution — follow in order
-
-1. **Verify with the godot MCP** — boot the project (`run_project`, add
-   `instanceId` for a second instance), check `get_debug_output` for errors,
-   take a `get_screenshot`. Never claim done on "should work". If any evidence
-   is negative, fix and repeat.
-
-2. **Report** — what changed, which skills used, how verified, what is still
-   open. Report failures with the actual output.

@@ -6,15 +6,16 @@
 
 - **Godot 4.7**, Forward Plus renderer.
 - Windows rendering driver forced to **D3D12** (`rendering/rendering_device/driver.windows="d3d12"`).
-- Main scene: `res://world/TestArena.tscn` (a debug arena, not a real level).
+- Main scene: `res://source/world/TestArena.tscn` (a debug arena, not a real level).
 
 ## Language — GDScript is the working language today
 
 - The GDD lists "Godot C#" as the stack, and the project *is* a .NET project
   (`Shatterless.csproj`, `Shatterless.sln`, `config/features` includes `"C#"`,
   `assembly_name="Shatterless"`).
-- **But every gameplay script in the repo is GDScript** (`player/player.gd`,
-  `weapons/bullet.gd`, `world/destructible_target.gd`). There is no `.cs` file.
+- **But every gameplay script in the repo is GDScript**
+  (`source/player/player.gd`, `source/weapons/bullet.gd`,
+  `source/world/destructible_target.gd`). There is no `.cs` file.
 - **Decision (2026-09-02):** write new gameplay code in **GDScript** to match
   what exists. Do not introduce C# scripts without an explicit call from the
   user — mixing the two adds a marshalling boundary and complicates the
@@ -52,28 +53,36 @@ Add new autoloads sparingly and document them here (see
 
 ## Repo layout
 
-Feature-first folders at the repo root, each holding its scene + script(s) +
-`.uid` files together:
+Hybrid layout: type-level split at the root for shared/infra concerns,
+feature-first folders under `source/` for gameplay, each holding its scene +
+script(s) + `.uid` files together:
 
 ```
-player/    player.tscn + player.gd
-weapons/   bullet.tscn + bullet.gd
-world/     TestArena.tscn, destructible_target.tscn + .gd
-addons/    godot-rapier3d, netfox   (git-ignored)
-.claude/   agents/, plugins/  (tooling, not shipped)
+source/
+  player/    player.tscn + player.gd + player_input.gd + player_spawner.gd
+  weapons/   bullet.tscn + bullet.gd
+  world/     TestArena.tscn, destructible_target.tscn + .gd
+autoload/    network_bootstrap.gd, network_hud.gd   (our own autoloads only)
+ui/          network_menu.tscn + .gd                (reusable UI, not gameplay)
+addons/      godot-rapier3d, netfox                  (git-ignored)
+.claude/     agents/, plugins/                       (tooling, not shipped)
 ```
 
-Keep this shape: a new system gets its own root folder with the scene and
-script side by side. No central `scripts/` or `scenes/` dump.
+Keep this shape: a new gameplay system gets its own folder under `source/`
+with the scene and script side by side. No central `scripts/` or `scenes/`
+dump. Only promote something out of `source/` (to `ui/`, `autoload/`) once
+it's genuinely shared across more than one feature.
 
 ## Conventions
 
-- **Typed GDScript, tabs, `##` header comment** on every script. Private
-  members prefixed `_`; the unprefixed surface is the public API
+- **Typed GDScript, tabs, no comments.** Names carry the intent; a comment
+  is only acceptable for a non-obvious invariant (e.g. why rollback state
+  must restore before simulate) — never a restatement of what the code does.
+  Private members prefixed `_`; the unprefixed surface is the public API
   (`launch()`, `take_damage()`). Tuning values as `const` SCREAMING_SNAKE_CASE
   at the top; `@export` for scene-wired deps, `@onready` for child refs.
 - **Files `snake_case`, nodes `PascalCase`.** Existing exception:
-  `world/TestArena.tscn` — leave it, new scenes use `snake_case`.
+  `source/world/TestArena.tscn` — leave it, new scenes use `snake_case`.
 - **Cross-node contact via groups + duck typing:** `add_to_group("player")`,
   `body.is_in_group("player")`, `body.has_method("take_damage")`. A
   "damageable" is anything with `take_damage(amount: int) -> void`.
@@ -86,8 +95,8 @@ script side by side. No central `scripts/` or `scenes/` dump.
   kept inside their feature folder.
 - **Promoting sandbox code to a real system:** port to rollback-safe
   simulation (`02-determinism-and-netcode.md`), split networked state from
-  local view, drop `print` debug lines, move it out of `world/` into its own
-  feature folder.
+  local view, drop `print` debug lines, move it out of `source/world/` into
+  its own feature folder under `source/`.
 
 ## Build / run
 

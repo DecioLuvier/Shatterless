@@ -1,6 +1,4 @@
 extends CanvasLayer
-## Host / join room UI. Wraps NetworkBootstrap; hides itself once a session
-## starts (host or client), shows itself again on disconnect.
 
 const DEFAULT_PORT := 8910
 

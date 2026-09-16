@@ -1,6 +1,4 @@
 extends Node
-## Autoload. ENet host/join, netfox-recommended pattern (create peer, poll
-## connection status, let NetworkEvents auto-start NetworkTime).
 
 signal connect_failed(reason: String)
 
@@ -8,9 +6,6 @@ const CONNECT_TIMEOUT := 10.0
 
 
 func _ready() -> void:
-	# CLI-driven autoconnect for headless/MCP testing (e.g. dual-instance
-	# netfox verification): --net-host=PORT or --net-join=ADDRESS:PORT.
-	# Never touches the UI path; ignored when absent.
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--net-host="):
 			var port := arg.substr("--net-host=".length()).to_int()

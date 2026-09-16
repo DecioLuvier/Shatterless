@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://c517eh5hvm08c"]
 
-[ext_resource type="PackedScene" uid="uid://dlu3plwhvm08c" path="res://player/player.tscn" id="1"]
-[ext_resource type="PackedScene" path="res://network/network_menu.tscn" id="3"]
-[ext_resource type="Script" path="res://player/player_spawner.gd" id="4"]
+[ext_resource type="PackedScene" uid="uid://dlu3plwhvm08c" path="res://source/player/player.tscn" id="1"]
+[ext_resource type="PackedScene" path="res://ui/network_menu.tscn" id="3"]
+[ext_resource type="Script" path="res://source/player/player_spawner.gd" id="4"]
+[ext_resource type="PackedScene" path="res://source/world/destructible_target.tscn" id="5"]
 
 [sub_resource type="ProceduralSkyMaterial" id="Sky_1"]
 
@@ -91,6 +92,15 @@ mesh = SubResource("WallMeshEW")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="WallWest" unique_id=580890552]
 shape = SubResource("WallShapeEW")
+
+[node name="Target1" parent="." instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.6, -8)
+
+[node name="Target2" parent="." instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -8)
+
+[node name="Target3" parent="." instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.6, -8)
 
 [node name="PlayerSpawner" type="Node" parent="." node_paths=PackedStringArray("spawn_root")]
 script = ExtResource("4")

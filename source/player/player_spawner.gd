@@ -1,8 +1,5 @@
 extends Node
 class_name PlayerSpawner
-## Spawns one Player avatar per connected peer. Falls back to a single local
-## avatar when no network session is running, so the arena still works
-## standalone (F5 in the editor, no host/join).
 
 @export var player_scene: PackedScene
 @export var spawn_root: Node
@@ -22,17 +19,16 @@ func _ready() -> void:
 	var peer := get_tree().get_multiplayer().multiplayer_peer
 	var has_menu := get_tree().get_root().find_child("NetworkMenu", true, false) != null
 	if (peer == null or peer is OfflineMultiplayerPeer) and not has_menu:
-		# No real multiplayer session and no menu waiting to host/join: start
-		# the simulation clock ourselves so the arena still ticks standalone
-		# (F5 in the editor, no host/join). When a NetworkMenu is present,
-		# let it drive the session; NetworkEvents starts NetworkTime once
-		# on_server_start/on_client_start fires, avoiding a double start.
 		NetworkTime.start()
 		_spawn(1)
 
 
 func _handle_connected(_id: int) -> void:
 	_spawn(multiplayer.get_unique_id())
+	for id in multiplayer.get_peers():
+		_spawn(id)
+	if multiplayer.get_unique_id() != 1:
+		_spawn(1)
 
 
 func _handle_host() -> void:
@@ -60,20 +56,24 @@ func _handle_stop() -> void:
 func _spawn(id: int) -> void:
 	if _avatars.has(id):
 		return
+	var peer := multiplayer.multiplayer_peer
+	if peer != null and not (peer is OfflineMultiplayerPeer) \
+			and peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
+		return
+
 	var avatar := player_scene.instantiate()
 	_avatars[id] = avatar
 	avatar.name += " #%d" % id
-	spawn_root.add_child.call_deferred(avatar)
-	await avatar.ready
-	# Offset each peer's spawn so avatars don't stack on the same point —
-	# lets both cylinders be seen apart on screen/in screenshots.
-	var slot := _avatars.keys().find(id)
-	avatar.global_position = spawn_point + Vector3(slot * 3.0, 0.0, 0.0)
 
-	# State is server-authoritative; input belongs to the owning peer.
 	avatar.set_multiplayer_authority(1)
 	var input := avatar.find_child("Input")
 	if input != null:
 		input.set_multiplayer_authority(id)
+
+	spawn_root.add_child.call_deferred(avatar)
+	await avatar.ready
+
+	var slot := _avatars.keys().find(id)
+	avatar.global_position = spawn_point + Vector3(slot * 3.0, 0.0, 0.0)
 
 	avatar.set_local_view(id == multiplayer.get_unique_id())

@@ -36,3 +36,7 @@ Follow `MAJOR.MINOR.PATCH`:
 - dev environment will always run two instances.
 - changed the c# for godot script
 - changed mcp (again lol)
+
+## [0.1.4] - 2026-09-16
+- minimal configuration of netfox to multiplayer
+- rework on file structure
