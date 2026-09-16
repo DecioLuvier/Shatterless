@@ -4,13 +4,13 @@ description: >
   ShatterLess Technical Design Document — the repo's engineering law. Read for any
   code change. Obey it over generic Godot patterns and over the `godot` router
   skill. Covers: Godot 4.7 + Forward Plus + D3D12, GDScript-not-C# decision,
-  Rapier3D + godot-rollback-netcode addons, the SyncManager autoload,
-  feature-folder repo layout, typing/naming conventions, and the determinism
-  rules for P2P deterministic lockstep with rollback (no wall-clock, no un-seeded
-  RNG, full state save/restore, simulation on the network tick). Trigger
-  keywords: TDD, architecture, determinism, rollback, lockstep, SyncManager,
-  _network_process, _save_state, netcode, Rapier3D, GDScript, autoload,
-  conventions, banned API.
+  Rapier3D + netfox addons, the NetworkTime/NetworkRollback/NetworkEvents
+  autoloads, feature-folder repo layout, typing/naming conventions, and the
+  determinism rules for P2P deterministic lockstep with rollback (no
+  wall-clock, no un-seeded RNG, full state save/restore, simulation on the
+  network tick). Trigger keywords: TDD, architecture, determinism, rollback,
+  lockstep, netfox, RollbackSynchronizer, _rollback_tick, netcode, Rapier3D,
+  GDScript, autoload, conventions, banned API.
 ---
 
 Read the reference that matches the task before designing or implementing. This skill overrides anything here on implementation detail.

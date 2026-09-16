@@ -30,14 +30,22 @@
 
 | Addon | Role | Notes |
 |---|---|---|
-| `godot-rollback-netcode` | P2P deterministic lockstep + rollback | Editor plugin enabled. Provides the `SyncManager` autoload. See `02-determinism-and-netcode.md`. |
+| `netfox` | P2P deterministic lockstep + rollback | Editor plugin enabled. Provides the `NetworkTime`, `NetworkTimeSynchronizer`, `NetworkRollback`, `NetworkEvents` autoloads and the `RollbackSynchronizer` node. See `02-determinism-and-netcode.md`. |
 | `godot-rapier3d` | Deterministic 3D physics | `project.godot` sets `3d/physics_engine="Rapier3D"`. Use Rapier bodies/queries, not the Godot-Physics defaults. |
 
 ## Autoloads
 
 | Name | Source | Purpose |
 |---|---|---|
-| `SyncManager` | `uid://dpiim8is0veq7` (rollback-netcode addon) | Owns the network tick, rollback, input capture. All simulation is driven from its callbacks, **not** `_process`/`_physics_process` wall-clock. |
+| `NetworkTime` | `res://addons/netfox/network-time.gd` (netfox addon) | Owns the network tick / tickrate. |
+| `NetworkTimeSynchronizer` | `res://addons/netfox/network-time-synchronizer.gd` (netfox addon) | Syncs tick/clock across peers. |
+| `NetworkRollback` | `res://addons/netfox/rollback/network-rollback.gd` (netfox addon) | Drives rollback replay. |
+| `NetworkEvents` | `res://addons/netfox/network-events.gd` (netfox addon) | Tick/rollback lifecycle signals. |
+
+Networked entities use a `RollbackSynchronizer` node (`state_properties` /
+`input_properties` exported arrays) and implement `_rollback_tick(delta, tick,
+is_fresh)`. All simulation is driven from there, **not** `_process`/
+`_physics_process` wall-clock.
 
 Add new autoloads sparingly and document them here (see
 `../skills/godot-autoload-architecture/SKILL.md` for the pattern).
@@ -51,7 +59,7 @@ Feature-first folders at the repo root, each holding its scene + script(s) +
 player/    player.tscn + player.gd
 weapons/   bullet.tscn + bullet.gd
 world/     TestArena.tscn, destructible_target.tscn + .gd
-addons/    godot-rapier3d, godot-rollback-netcode   (git-ignored)
+addons/    godot-rapier3d, netfox   (git-ignored)
 .claude/   agents/, plugins/  (tooling, not shipped)
 ```
 
@@ -85,7 +93,9 @@ script side by side. No central `scripts/` or `scenes/` dump.
 
 - Open in the Godot 4.7 editor; it triggers the .NET build via the csproj.
 - The `developer` agent verifies changes through the **godot MCP**
-  (`run_project` → `get_debug_output` → `send_game_command` →
-  `capture_screenshot` → `stop_project`), never by assertion that it "should
-  work". See `../../developer.md`.
+  (`run_project`, optionally with `instanceId` for a second native instance —
+  e.g. netfox host/client → `get_debug_output` → `get_screenshot` →
+  `stop_project`), never by assertion that it "should work". No
+  input-simulation tools exist (no click/key/gamepad) — verification is
+  read-only (logs, errors, screenshots). See `../../developer.md`.
 - `.gitignore` already covers `.godot/`, `bin/`, `obj/`, `*.pck`, exports.

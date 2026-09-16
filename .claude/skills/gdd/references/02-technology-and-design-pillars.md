@@ -20,7 +20,7 @@
 ## Technology Stack
 
 - **Godot C#:** Main game engine.
-- **Godot Rollback Netcode:** P2P deterministic lockstep networking.
+- **netfox:** P2P deterministic lockstep networking with rollback.
 - **Rapier:** Deterministic physics.
 - **Blender:** Level design and map construction.
 - **Wave Function Collapse:** Procedural generation algorithm.
@@ -29,8 +29,8 @@
 
 - Networking model is deterministic lockstep with rollback — gameplay code
   must stay deterministic (fixed tick, no wall-clock, no un-seeded RNG in
-  simulation). See `addons/godot-rollback-netcode` and the `SyncManager`
-  autoload.
+  simulation). See `addons/netfox` and the `NetworkTime`/`NetworkRollback`
+  autoloads.
 - Physics engine is Rapier3D (already set in `project.godot`).
 - Prefer the repo's `godot-*` skills for engine-specific patterns
   (procedural generation / WFC, multiplayer, physics-3d, genre-horror,

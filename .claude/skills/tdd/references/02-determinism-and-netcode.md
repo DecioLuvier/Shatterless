@@ -2,8 +2,8 @@
 
 *2026-09-02.*
 
-ShatterLess is **P2P deterministic lockstep with rollback** (`godot-rollback-netcode`
-+ Rapier3D). Co-op is a core design pillar, so **every gameplay change is a
+ShatterLess is **P2P deterministic lockstep with rollback** (`netfox` +
+Rapier3D). Co-op is a core design pillar, so **every gameplay change is a
 netcode change**. If two peers simulate the same tick from the same inputs and
 get different state, the game desyncs.
 
@@ -13,10 +13,12 @@ Reference pattern: `../skills/godot-multiplayer-networking/SKILL.md`,
 ## The rules
 
 1. **Simulation runs on the network tick, not the frame.** Gameplay logic
-   belongs in `_network_process(input)` / the rollback callbacks
-   (`_save_state`, `_load_state`, `_get_local_input`, `_network_spawn`, …),
-   **not** in `_process` or raw `_physics_process`. `_process` is for
-   view-only cosmetics (viewmodel sway, camera bob, muzzle flash fade).
+   belongs in `_rollback_tick(delta, tick, is_fresh)`, called by a
+   `RollbackSynchronizer` node on the entity's root, **not** in `_process` or
+   raw `_physics_process`. State that must survive rollback goes in the
+   synchronizer's `state_properties`; input goes in `input_properties`.
+   `_process` is for view-only cosmetics (viewmodel sway, camera bob, muzzle
+   flash fade).
 
 2. **No wall-clock time.** Banned in simulation code:
    - `get_tree().create_timer(...)`
@@ -27,19 +29,22 @@ Reference pattern: `../skills/godot-multiplayer-networking/SKILL.md`,
    ticks).
 
 3. **No un-seeded randomness.** Banned: `randf()`, `randi()`, `randf_range()`,
-   `randomize()`. Use a rollback-safe seeded RNG that is saved and restored
-   with game state (the addon's `SyncManager.get_rng()` / a `RandomNumberGenerator`
-   whose `seed` and `state` are part of `_save_state`).
+   `randomize()`. Use a seeded `RandomNumberGenerator` whose `seed` and
+   `state` are listed in the entity's `RollbackSynchronizer.state_properties`
+   so rollback saves/restores it like any other state.
 
 4. **All gameplay state must be saved/restored.** Anything a rollback needs to
-   rewind goes into `_save_state()` and comes back in `_load_state()`:
-   positions, velocities, health, cooldowns (as tick deadlines), RNG state,
-   ammo, inventory slots. State the addon can't see = desync on rollback.
+   rewind — positions, velocities, health, cooldowns (as tick deadlines), RNG
+   state, ammo, inventory slots — must be listed in
+   `RollbackSynchronizer.state_properties`. State the synchronizer can't see
+   = desync on rollback.
 
-5. **Input comes from the addon, not `Input`.** Read actions through
-   `_get_local_input()` and act on the `input` dict passed to
-   `_network_process`. Direct `Input.is_action_pressed(...)` in simulation is
-   only acceptable for view code.
+5. **Input is polled only on fresh authority ticks.** Inside `_rollback_tick`,
+   read `Input.is_action_pressed(...)` only when
+   `is_multiplayer_authority()` and `is_fresh` is true, and write the result
+   into a property listed in `RollbackSynchronizer.input_properties`. On
+   replayed ticks (`is_fresh == false`) the stored input is reused instead of
+   re-polling.
 
 6. **Physics is Rapier, and it's deterministic — keep it that way.** Don't mix
    in Godot-Physics nodes for gameplay collision. Fixed tick delta only; never
@@ -48,12 +53,16 @@ Reference pattern: `../skills/godot-multiplayer-networking/SKILL.md`,
 7. **Floats:** same order of operations on every peer. No platform-specific
    fast-math paths, no `is_equal_approx` gates that can diverge.
 
-## `SyncManager`
+## `netfox` autoloads and nodes
 
-Autoload from the addon (`uid://dpiim8is0veq7`). Owns tick advance, input
-broadcast, rollback, and (in debug) the `sync_debug` input action bound to a
-key. New networked entities register with it and implement the rollback
-callbacks. Don't reach around it to send state manually.
+- `NetworkTime` — owns tick advance / tickrate.
+- `NetworkTimeSynchronizer` — syncs the clock across peers.
+- `NetworkRollback` — drives rollback replay (`NetworkRollback.tick`, history depth).
+- `NetworkEvents` — tick/rollback lifecycle signals.
+- `RollbackSynchronizer` (per-entity node, not an autoload) — declares
+  `state_properties` / `input_properties` and calls `_rollback_tick` on the
+  entity. New networked entities add one of these; don't reach around it to
+  send state manually.
 
 ## Known violations in the current debug code
 
@@ -63,11 +72,13 @@ Before any of this becomes real co-op gameplay it must be ported:
 
 | Location | Non-deterministic construct | Fix |
 |---|---|---|
-| `player.gd` `_physics_process` | movement driven by engine `delta` + raw `Input` | move to `_network_process`, use fixed tick delta + `input` dict |
-| `player.gd` `_fire` / `_muzzle_fx` | `randf()`, `randf_range()`, `_flash_time` in seconds | seeded RNG in saved state; cooldown as tick deadline. Muzzle *visual* can stay in `_process`. |
+| ~~`player.gd` `_physics_process`~~ | ~~movement driven by engine `delta` + raw `Input`~~ | **Done:** movement moved to `_rollback_tick` via a `RollbackSynchronizer` + `PlayerInput` node (`player/player_input.gd`). Camera look stays frame-driven (view). |
+| ~~static `Player` in `TestArena.tscn`~~ | ~~single hardcoded instance, no per-peer spawn~~ | **Done:** `world/TestArena.tscn` uses `player/player_spawner.gd` (`PlayerSpawner`), one avatar per peer via `NetworkEvents`, falls back to a single local avatar with no session running. Body state authority = server (1), input authority = owning peer, `Player.set_local_view()` gates camera/HUD/mouse-capture to the owning machine only. |
+| ~~`player.gd` `_fire` / `_start_reload` / `_finish_reload`~~ | ~~ammo/reload not networked, `RELOAD_DURATION` in seconds~~ | **Done:** `_mag`/`_reserve`/`_reloading`/`_reload_deadline_tick` are in `state_properties`; `fire_pressed`/`reload_pressed` are input properties; reload deadline is a tick count (`_reload_ticks`, derived from `NetworkTime.tickrate` once in `_ready`, not wall-clock). |
+| `player.gd` `_muzzle_fx` / `_push_click` / `_push_gunshot` | `randf()`, `randf_range()` | Not a desync risk as written: gated behind `is_fresh` in `_fire`/`_finish_reload`, so they never re-run on rollback replay. View/audio only — they don't touch `state_properties`. |
 | `player.gd` `_warmup` / `call_deferred` / `await process_frame` | frame-timed | keep as a one-shot cosmetic warmup only; must not gate simulation |
-| `bullet.gd` | `create_timer(LIFETIME)`, movement on `_physics_process` delta | spawn via `_network_spawn`, lifetime as tick count, move in `_network_process`, state saved |
-| `destructible_target.gd` | `create_tween()` flash, `print` on destroy | tween is view-only (OK if health/despawn are networked); destruction must be a networked state change |
+| ~~`bullet.gd`~~ | ~~`create_timer(LIFETIME)`, movement on `_physics_process` delta, `body_entered` signal~~ | **Done:** own `RollbackSynchronizer` (`:global_position`, `:_direction`, `:_ticks_left`, `:_dead`); moves and counts down lifetime in `_rollback_tick`; hit detection polls `get_overlapping_bodies()` instead of the signal; `_rollback_spawn`/`_rollback_despawn` hide/disable instead of `queue_free()` mid-rollback. Cross-peer replication needs no `MultiplayerSpawner`: `fire_pressed` is a broadcast input property, so every peer independently simulates the same shot on the same tick and spawns its own local bullet instance — consistent as long as the firing `Player`'s input is replicated (see spawner row above). |
+| ~~`destructible_target.gd`~~ | ~~`queue_free()` on destroy, unnetworked `_health`, `print`~~ | **Done:** own `RollbackSynchronizer` (`:_health`, `:_dead`); destruction goes through `_rollback_despawn`/`_rollback_spawn` instead of `queue_free()`; `take_damage()` is called from the hitting node's tick and calls `NetworkRollback.mutate(self)` (see "Modifying objects during rollback" in the netfox docs) since the change didn't originate from `_rollback_tick`; the `create_tween()` flash is view-only and gated on the caller's `is_fresh`; `print` removed. |
 
 Treat the split as: **networked simulation** (tick, saved, deterministic) vs
 **local view** (frame, disposable, may use tweens/random/`Input`).

@@ -35,7 +35,7 @@ Match the task to a row, then read `references/<sub-skill>/SKILL.md` (and its no
 | PBR surfaces, ORM packing, transparency, material tuning | `godot-3d-materials` |
 | Checkpoints / revive / downed / corpse-run / ghost | `godot-mechanic-revival` |
 | Save / load / settings / versioned migration | `godot-save-load-systems` |
-| Managers, autoloads (`SyncManager`), init order | `godot-autoload-architecture` |
+| Managers, autoloads (`NetworkTime`, `NetworkRollback`), init order | `godot-autoload-architecture` |
 | Decoupling, event bus, typed signals, one-shot connections | `godot-signal-architecture` |
 | Project layout, naming, `.gitignore`/`.gdignore` | `godot-project-foundations` |
 | Entity-Component "Has-A" composition | `godot-composition` |

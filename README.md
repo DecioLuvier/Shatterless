@@ -29,3 +29,10 @@ Follow `MAJOR.MINOR.PATCH`:
 ## [0.1.2] - 2026-09-10
 - new godot mcp
 - Rework on developer agent
+
+## [0.1.3] - 2026-09-15
+- enabled plugins: godot-rapier3d and netfox
+- changed render method to OpenGL, and setup for performance.
+- dev environment will always run two instances.
+- changed the c# for godot script
+- changed mcp (again lol)

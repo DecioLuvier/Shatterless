@@ -14,10 +14,9 @@ obj/
 *.dmg
 *.apk
 *.aab
-addons/*/*
-!addons/*/.gitkeep
 .claude/screenshots/
 .claude/godot-mcp/node_modules/
+.claude/godot-mcp/package-lock.json
 .idea/
 .DS_Store
 Thumbs.db
